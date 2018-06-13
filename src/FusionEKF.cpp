@@ -1,7 +1,8 @@
 #include "FusionEKF.h"
-#include "tools.h"
-#include "Eigen/Dense"
+#include <cmath>
 #include <iostream>
+#include "Eigen/Dense"
+#include "tools.h"
 
 using namespace std;
 using Eigen::MatrixXd;
@@ -22,42 +23,35 @@ FusionEKF::FusionEKF() {
   H_laser_ = MatrixXd(2, 4);
   Hj_ = MatrixXd(3, 4);
 
-  //measurement covariance matrix - laser
-  R_laser_ << 0.0225, 0,
-        0, 0.0225;
+  // measurement covariance matrix - laser
+  R_laser_ << 0.0225, 0, 0, 0.0225;
 
-  //measurement covariance matrix - radar
-  R_radar_ << 0.09, 0, 0,
-        0, 0.0009, 0,
-        0, 0, 0.09;
+  // measurement covariance matrix - radar
+  R_radar_ << 0.09, 0, 0, 0, 0.0009, 0, 0, 0, 0.09;
 
   /**
   TODO:
     * Finish initializing the FusionEKF.
     * Set the process and measurement noises
   */
-
-
 }
 
 /**
-* Destructor.
-*/
+ * Destructor.
+ */
 FusionEKF::~FusionEKF() {}
 
 void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
-
-
   /*****************************************************************************
    *  Initialization
    ****************************************************************************/
   if (!is_initialized_) {
     /**
-    TODO:
-      * Initialize the state ekf_.x_ with the first measurement.
-      * Create the covariance matrix.
-      * Remember: you'll need to convert radar from polar to cartesian coordinates.
-    */
+     * Initialize the state ekf_.x_ with the first measurement.
+     * Create the covariance matrix.
+     * Remember: you'll need to convert radar from polar to cartesian
+     * coordinates.
+     */
     // first measurement
     cout << "EKF: " << endl;
     ekf_.x_ = VectorXd(4);
@@ -67,12 +61,19 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
       /**
       Convert radar from polar to cartesian coordinates and initialize state.
       */
-    }
-    else if (measurement_pack.sensor_type_ == MeasurementPackage::LASER) {
+      float rho = measurement_pack.raw_measurements_[0];
+      float phi = measurement_pack.raw_measurements_[1];
+      float px = rho / sqrt(1 + tan(phi) * tan(phi));
+      float py = px * tan(phi);
+      ekf_.x_ << px, py, 0, 0;
+    } else if (measurement_pack.sensor_type_ == MeasurementPackage::LASER) {
       /**
       Initialize state.
       */
+      ekf_.x_ << measurement_pack.raw_measurements_[0],
+          measurement_pack.raw_measurements_[1], 0, 0;
     }
+    previous_timestamp_ = measurement_pack.timestamp_;
 
     // done initializing, no need to predict or update
     is_initialized_ = true;
