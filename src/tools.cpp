@@ -9,8 +9,7 @@ Tools::Tools() {}
 
 Tools::~Tools() {}
 
-VectorXd Tools::CalculateRMSE(const vector<VectorXd> &estimations,
-                              const vector<VectorXd> &ground_truth) {
+VectorXd Tools::CalculateRMSE(const vector<VectorXd> &estimations, const vector<VectorXd> &ground_truth) {
   VectorXd rmse(4);
   rmse << 0, 0, 0, 0;
 
@@ -63,9 +62,7 @@ MatrixXd Tools::CalculateJacobian(const VectorXd &x_state) {
   // Hj(2, 0) and Hj(2, 1) seems to have common factor whose difference is only
   // negation It's repeated there for 0 and -0 are actually different in
   // floating point numbers
-  Hj << (px / c2), (py / c2), 0, 0, -(py / c1), (px / c1), 0, 0,
-      py * (vx * py - vy * px) / c3, px * (px * vy - py * vx) / c3, px / c2,
-      py / c2;
+  Hj << (px / c2), (py / c2), 0, 0, -(py / c1), (px / c1), 0, 0, py * (vx * py - vy * px) / c3, px * (px * vy - py * vx) / c3, px / c2, py / c2;
 
   return Hj;
 }

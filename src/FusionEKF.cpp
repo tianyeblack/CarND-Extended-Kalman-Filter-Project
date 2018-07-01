@@ -34,6 +34,12 @@ FusionEKF::FusionEKF() {
     * Finish initializing the FusionEKF.
     * Set the process and measurement noises
   */
+  ekf_.x_ = VectorXd(4);
+  ekf_.x_ << 1, 1, 1, 1;
+  ekf_.P_ = MatrixXd(4, 4);
+  ekf_.P_ << 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1000, 0, 0, 0, 0, 1000;
+  ekf_.F_ = MatrixXd(4, 4);
+  ekf_.F_ << 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1;
 }
 
 /**
@@ -53,10 +59,6 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
      * coordinates.
      */
     // first measurement
-    cout << "EKF: " << endl;
-    ekf_.x_ = VectorXd(4);
-    ekf_.x_ << 1, 1, 1, 1;
-
     if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
       /**
       Convert radar from polar to cartesian coordinates and initialize state.
@@ -70,8 +72,7 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
       /**
       Initialize state.
       */
-      ekf_.x_ << measurement_pack.raw_measurements_[0],
-          measurement_pack.raw_measurements_[1], 0, 0;
+      ekf_.x_ << measurement_pack.raw_measurements_[0], measurement_pack.raw_measurements_[1], 0, 0;
     }
     previous_timestamp_ = measurement_pack.timestamp_;
 
