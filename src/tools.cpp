@@ -59,9 +59,8 @@ MatrixXd Tools::CalculateJacobian(const VectorXd &x_state) {
   }
 
   // compute the Jacobian matrix
-  // Hj(2, 0) and Hj(2, 1) seems to have common factor whose difference is only
-  // negation It's repeated there for 0 and -0 are actually different in
-  // floating point numbers
+  // Hj(2, 0) and Hj(2, 1) seems to have common factor whose difference is only negation
+  // It's repeated there for 0 and -0 are actually different in floating point representation
   Hj << (px / c2), (py / c2), 0, 0, -(py / c1), (px / c1), 0, 0, py * (vx * py - vy * px) / c3, px * (px * vy - py * vx) / c3, px / c2, py / c2;
 
   return Hj;
